@@ -49,6 +49,13 @@ export default class Vector {
         return Math.atan (this.y / this.x) * 180 / Math.PI + (this.x > 0 ? 90 : -90);
     }
 
+    get radians () {
+        if (this.x === 0) {
+            return this.y > 0 ? Math.PI : 0;
+        }
+        return Math.atan (this.y / this.x) + (this.x > 0 ? Math.PI / 2 : Math.PI / -2);
+    }
+
     add (other) {
         return new Vector(this.x + other.x, this.y + other.y);
     }
