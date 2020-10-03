@@ -3,6 +3,7 @@
     import Disc from '../game/Disc.js';
     import Vector from '../game/Vector.js';
     import { onMount, onDestroy } from 'svelte';
+    import Fullscreen from '../components/Fullscreen.svelte';
     import GameCanvas from '../components/GameCanvas.svelte';
     import MouseEvents from '../components/MouseEvents.svelte';
 
@@ -37,9 +38,11 @@
     }
 
     function click({detail: point}) {
+        if (point.x < 0 || point.x > (16/9) || point.y < 0 || point.y > 1) return;
         discs.push(new Disc(point, discs.length === 0 ? 'darkred' : 'yellow'));
     }
 </script>
 
 <MouseEvents element={canvas} on:click={click} />
 <GameCanvas bind:canvas ratio={16/9} on:update={update} styles="bg-teal-400" />
+<Fullscreen />
