@@ -24,22 +24,22 @@ export default class Disc {
         })
     }
 
-    update (delta) {
+    update (detail) {
         // friction
-        this.addForce(this.velocity.multiply(-.0015 * delta));
+        this.addForce(this.velocity.multiply(-.0015 * detail.delta));
 
         // apply acceleration
         this.velocity = this.velocity.add(this.acceleration);
         this.acceleration = new Vector();
 
         // bounce off bondaries
-        if (this.position.x > 1 - this.radius && this.velocity.x > 0) { // right
+        if (this.position.x > detail.width - this.radius && this.velocity.x > 0) { // right
             this.addForce(Vector.left(this.velocity.x * 2));
         }
         if (this.position.x < 0 + this.radius && this.velocity.x < 0) { // left
             this.addForce(Vector.left(this.velocity.x * 2));
         }
-        if (this.position.y > 1 - this.radius && this.velocity.y > 0) { // bottom
+        if (this.position.y > detail.height - this.radius && this.velocity.y > 0) { // bottom
             this.addForce(Vector.up(this.velocity.y * 2));
         }
         if (this.position.y < 0 + this.radius && this.velocity.y < 0) { // top

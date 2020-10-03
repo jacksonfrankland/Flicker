@@ -30,9 +30,9 @@
     })
 
     function update ({detail}) {
-        Disc.collisionDetection(discs);
-        discs.forEach(disc => disc.update(detail.delta));
         detail.clear();
+        Disc.collisionDetection(discs);
+        discs.forEach(disc => disc.update(detail));
         discs.forEach(disc => disc.draw(detail));
     }
 
@@ -42,4 +42,4 @@
 </script>
 
 <MouseEvents element={canvas} on:click={click} />
-<GameCanvas bind:canvas on:update={update} styles="bg-teal-400" />
+<GameCanvas bind:canvas ratio={16/9} on:update={update} styles="bg-teal-400" />

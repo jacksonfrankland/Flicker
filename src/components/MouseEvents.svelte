@@ -6,11 +6,15 @@
     const dispatch = createEventDispatcher();
 
     function mouseEvent (e, event) {
-        dispatch(event, new Vector((e.pageX - element.getBoundingClientRect().left) / element.clientWidth, (e.pageY - element.getBoundingClientRect().top) / element.clientHeight));
+        dispatch(event, new Vector((e.pageX - element.getBoundingClientRect().left) / elementSize(), (e.pageY - element.getBoundingClientRect().top) / elementSize()));
     }
 
     function touchEvent (e, event) {
-        dispatch(event, new Vector((e.touches[0].pageX - element.getBoundingClientRect().left) / element.clientWidth, (e.touches[0].pageY - element.getBoundingClientRect().top) / element.clientHeight));
+        dispatch(event, new Vector((e.touches[0].pageX - element.getBoundingClientRect().left) / elementSize(), (e.touches[0].pageY - element.getBoundingClientRect().top) / elementSize()));
+    }
+
+    function elementSize () {
+        return Math.min(element.clientWidth, element.clientHeight);
     }
 </script>
 

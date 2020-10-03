@@ -1,6 +1,8 @@
 <script>
     export let styles = "";
+    export let ratio = 1;
     export let canvas;
+
     import { onMount } from 'svelte';
     import Vector from '../game/Vector.js';
     import { createEventDispatcher } from 'svelte';
@@ -9,7 +11,9 @@
 
     let outerWidth, outerHeight;
     let scale = 1;
-    $: canvasSize = Math.min(outerWidth, outerHeight) * scale;
+    $: width = ratio > 1 ? ratio : 1;
+    $: height = ratio < 1 ? 1 / ratio : 1;
+    $: canvasSize = Math.min(outerWidth * width, outerHeight * height) * scale;
 
     onMount(() => {
         scale = devicePixelRatio;
@@ -18,7 +22,7 @@
         let oldTimestamp;
 
         function clear () {
-            ctx.clearRect(0, 0, canvasSize, canvasSize);
+            ctx.clearRect(0, 0, canvasSize * width, canvasSize * height);
         }
 
         function circle (position, radius, fill) {
@@ -37,7 +41,7 @@
             }
             let delta = timestamp - oldTimestamp;
             oldTimestamp = timestamp
-            dispatch('update', {ctx, delta, canvasSize, clear, circle});
+            dispatch('update', {ctx, delta, canvasSize, clear, circle, width, height});
             requestAnimationFrame(step);
         }
         let animationFrame = requestAnimationFrame(step);
@@ -49,9 +53,9 @@
 
 <div class="w-full h-full flex" bind:clientWidth={outerWidth} bind:clientHeight={outerHeight}>
     <canvas
-        class="m-auto {outerHeight > outerWidth ? 'w-full' : 'h-full'} {styles}"
+        class="m-auto {outerHeight * width > outerWidth * height ? 'w-full' : 'h-full'} {styles}"
         bind:this={canvas}
-        width={canvasSize}
-        height={canvasSize}
+        width={canvasSize * width}
+        height={canvasSize * height}
     ></canvas>
 </div>
