@@ -21,14 +21,9 @@
             detail.ctx.translate(ORIGIN.x * detail.canvasSize, ORIGIN.y * detail.canvasSize);
             detail.ctx.rotate(ORIGIN.subtract(position).radians);
             detail.ctx.translate(ORIGIN.x * detail.canvasSize * -1, ORIGIN.y * detail.canvasSize * -1);
-            detail.ctx.translate(ORIGIN.x * detail.canvasSize, (ORIGIN.y - .15) * detail.canvasSize);
-            let arrow = new Path2D('M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z');
-            detail.ctx.scale(.05 * detail.canvasSize, .05 * detail.canvasSize);
-            let scale = ORIGIN.subtract(position).magnitude
-            detail.ctx.scale(scale, scale);
-            detail.ctx.translate(-10, -20)
-            detail.ctx.fillStyle = 'yellow';
-            detail.ctx.fill(arrow);
+            let arrow = 'M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z';
+            let scale = ORIGIN.subtract(position).magnitude;
+            detail.svgPath(arrow, ORIGIN.add(Vector.up(.15)), 0, 1, 20, 20, scale, scale, 'yellow');
             detail.ctx.restore();
         }
     }

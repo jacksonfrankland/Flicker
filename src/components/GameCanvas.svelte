@@ -35,13 +35,26 @@
             ctx.restore();
         }
 
+    // detail.svgPath(arrow, ORIGIN.add(Vector.up(.15)), .5, 1, 20, 20, scale, scale, 'yellow');
+        function svgPath (d, position, xOffset, yOffset, vbWidth, vbHeight, width, height, fill) {
+            ctx.save();
+            ctx.translate(position.x * canvasSize, position.y * canvasSize);
+            let path = new Path2D(d);
+            ctx.scale(1 / vbWidth * canvasSize, 1 / vbHeight * canvasSize);
+            ctx.scale(width, height);
+            ctx.translate(vbWidth * (-.5 * (xOffset + 1)), vbHeight * (-.5 * (yOffset + 1)));
+            ctx.fillStyle = fill;
+            ctx.fill(path);
+            ctx.restore();
+        }
+
         function step (timestamp) {
             if (oldTimestamp === undefined) {
                 oldTimestamp = timestamp;
             }
             let delta = timestamp - oldTimestamp;
             oldTimestamp = timestamp
-            dispatch('update', {ctx, delta, canvasSize, clear, circle, width, height});
+            dispatch('update', {ctx, delta, canvasSize, clear, circle, width, height, svgPath});
             requestAnimationFrame(step);
         }
         let animationFrame = requestAnimationFrame(step);
