@@ -65,7 +65,7 @@ export default class Vector {
     }
 
     multiply (scalar) {
-        return new Vector (this.x * scalar, this.y *scalar);
+        return new Vector (this.x * scalar, this.y * scalar);
     }
 
     distanceSquared (other) {
