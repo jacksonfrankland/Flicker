@@ -19,13 +19,13 @@ export default class CanvasHelper {
         this.ctx.restore();
     }
 
-    svgPath (d, position, xOffset, yOffset, vbWidth, vbHeight, width, height, fill) {
+    svgPath (d, fill, position, offset, viewBox, scale) {
         this.ctx.save();
         this.ctx.translate(position.x * this.canvasSize, position.y * this.canvasSize);
         let path = new Path2D(d);
-        this.ctx.scale(1 / vbWidth * this.canvasSize, 1 / vbHeight * this.canvasSize);
-        this.ctx.scale(width, height);
-        this.ctx.translate(vbWidth * (-.5 * (xOffset + 1)), vbHeight * (-.5 * (yOffset + 1)));
+        this.ctx.scale(1 / viewBox.x * this.canvasSize, 1 / viewBox.y * this.canvasSize);
+        this.ctx.scale(scale.x, scale.y);
+        this.ctx.translate(viewBox.x * (-.5 * (offset.x + 1)), viewBox.y * (-.5 * (offset.y + 1)));
         this.ctx.fillStyle = fill;
         this.ctx.fill(path);
         this.ctx.restore();

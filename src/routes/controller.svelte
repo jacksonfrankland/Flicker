@@ -23,7 +23,7 @@
             detail.ctx.translate(ORIGIN.x * detail.canvasSize * -1, ORIGIN.y * detail.canvasSize * -1);
             let arrow = 'M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z';
             let scale = ORIGIN.subtract(position).magnitude;
-            detail.svgPath(arrow, ORIGIN.add(Vector.up(.15)), 0, 1, 20, 20, scale, scale, 'white');
+            detail.svgPath(arrow, 'white', ORIGIN.add(Vector.up(.15)), new Vector(0, 1), new Vector(20, 20), new Vector(scale, scale));
             detail.ctx.restore();
         }
     }
