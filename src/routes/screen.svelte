@@ -39,7 +39,7 @@
 
     function click({detail: point}) {
         if (point.x < 0 || point.x > (16/9) || point.y < 0 || point.y > 1) return;
-        discs.push(new Disc(point, discs.length === 0 ? 'darkred' : 'yellow'));
+        discs.push(new Disc(point, discs.length === 0 ? 'black' : 'white'));
     }
 </script>
 
