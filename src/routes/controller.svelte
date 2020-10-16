@@ -48,11 +48,9 @@
     async function mouseUp () {
         dragging = false;
         offset = new Vector;
-        const {x, y} = ORIGIN.subtract(position);
+        let flick = ORIGIN.subtract(position).basic;
         position = ORIGIN;
-        await $db.doc('games/IvZX12c3ceKR75285JEn').update({
-            flick: {x, y}
-        });
+        await $db.from('games').update({ flick }).eq('id', 1);
     }
 </script>
 

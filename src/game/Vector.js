@@ -9,6 +9,10 @@ export default class Vector {
         return new Vector(x, y);
     }
 
+    static construct(vector) {
+        return new Vector (vector.x, vector.y);
+    }
+
     static right (x = 1) {
         return new Vector(x, 0);
     }
@@ -23,6 +27,10 @@ export default class Vector {
 
     static down (y = 1) {
         return new Vector(0, y);
+    }
+
+    get basic () {
+        return {x: this.x, y: this.y};
     }
 
     get round () {

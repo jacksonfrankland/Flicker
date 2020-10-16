@@ -1,15 +1,11 @@
-import * as sapper from '@sapper/app';
-import firebase from 'firebase/app';
-import 'firebase/firestore';
 import { db } from './store.js';
+import * as sapper from '@sapper/app';
+import { createClient } from '@supabase/supabase-js';
 
-firebase.initializeApp({
-    apiKey: "AIzaSyC5bthZaINKH0tammgefutfrkdV0cdsvG8",
-    authDomain: "flicker-c92ac.firebaseapp.com",
-    projectId: "flicker-c92ac",
-});
-
-db.set(firebase.firestore());
+db.set(createClient(
+    'https://ubqeqgehiclrzutwihws.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTYwMjgyNzc3MiwiZXhwIjoxOTE4NDAzNzcyfQ.Trii68Rql6_K6EO-BsS-1btZ3hk8ULmKgWZ0STBiMiw'
+));
 
 sapper.start({
 	target: document.querySelector('#sapper')

@@ -9,24 +9,18 @@
 
     let discs = [];
     let canvas;
-    let stopUpdates;
+    let gameSubscription;
 
     onMount(async () => {
-        setInterval(() => {
-            if (discs.length > 0) {
-                // console.log(discs[0].velocity);
-            }
-        }, 500)
-        stopUpdates = $db.doc('games/IvZX12c3ceKR75285JEn').onSnapshot(doc => {
+        gameSubscription = $db.from('games').on('UPDATE', payload => {
             if (discs.length === 0) return;
-            let {flick} = doc.data();
-            discs[0].addForce(Vector.create(flick.x, flick.y).multiply(.008));
-        })
+            discs[0].addForce(Vector.construct(payload.new.flick).multiply(.008));
+        }).subscribe();
     });
 
     onDestroy(() => {
-        if (stopUpdates) {
-            stopUpdates();
+        if (gameSubscription) {
+            gameSubscription.unsubscribe();
         }
     })
 
