@@ -10,7 +10,7 @@
 
 {#if screenfull.isEnabled && !fullscreen}
     <svg
-        on:click={() => {screenfull.request();}}
+        on:click={() => {screenfull.request()}}
         class="absolute bottom-0 right-0 h-16 w-16 text-gray-500 cursor-pointer"
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
