@@ -1,42 +1,72 @@
-<script>
-    import { db } from '../store.js';
-    import Disc from '../game/Disc.js';
-    import Vector from '../game/Vector.js';
-    import { onMount, onDestroy } from 'svelte';
-    import Fullscreen from '../components/Fullscreen.svelte';
-    import GameCanvas from '../components/GameCanvas.svelte';
-    import MouseEvents from '../components/MouseEvents.svelte';
-
-    let discs = [];
-    let canvas;
-    let gameSubscription;
-
-    onMount(async () => {
-        gameSubscription = $db.from('games').on('UPDATE', payload => {
-            if (discs.length === 0) return;
-            discs[0].addForce(Vector.construct(payload.new.flick).multiply(.008));
-        }).subscribe();
-    });
-
-    onDestroy(() => {
-        if (gameSubscription) {
-            gameSubscription.unsubscribe();
+<script context="module">
+    export async function preload(page, session) {
+        if (!session.game) {
+            const res = await this.fetch('games');
+            const game = await res.json();
+            session.game = game;
         }
-    })
-
-    function update ({detail}) {
-        detail.clear();
-        Disc.collisionDetection(discs);
-        discs.forEach(disc => disc.update(detail));
-        discs.forEach(disc => disc.draw(detail));
-    }
-
-    function click({detail: point}) {
-        if (point.x < 0 || point.x > (16/9) || point.y < 0 || point.y > 1) return;
-        discs.push(new Disc(point, discs.length === 0 ? 'black' : 'white'));
     }
 </script>
 
-<MouseEvents element={canvas} on:click={click} />
-<GameCanvas bind:canvas ratio={16/9} on:update={update} styles="bg-teal-400" />
+<script>
+    import { db } from '../store.js';
+    import { stores } from '@sapper/app';
+    import { onMount, onDestroy } from 'svelte';
+    import Lobby from '../components/Lobby.svelte';
+    import Screen from '../components/Screen.svelte';
+    import Spinner from '../components/Spinner.svelte';
+    import Fullscreen from '../components/Fullscreen.svelte';
+
+    const { session } = stores();
+
+    let subscriptions = [];
+
+    onMount(async () => {
+        if (!$session.game) {
+            await newGame();
+        }
+        subscribe();
+    });
+
+    onDestroy(() => {
+        unsubscribe();
+    })
+
+    async function newGame () {
+        $session.game = null;
+        const res = await fetch('games', {
+            method: 'post'
+        });
+        $session.game = await res.json();
+    }
+
+    function unsubscribe () {
+        subscriptions.forEach(subscription => $db.removeSubscription(subscription));
+        subscriptions = [];
+    }
+
+    function subscribe () {
+        subscriptions.push($db.from('games').eq('id', $session.game.id).on('UPDATE', async payload => {
+            let players = $session.game.players;
+            $session.game = {...payload.new, players};
+            if ($session.game.deleted_at) {
+                await newGame();
+                unsubscribe();
+                subscribe();
+            }
+        }).subscribe());
+        subscriptions.push($db.from('players').eq('game_id', $session.game.id).on('*', payload => {
+            console.log(payload);
+            $session.game.players = [...$session.game.players.filter(player => player.id != payload.new.id), payload.new].filter(player => player.in_game);
+        }).subscribe());
+    }
+</script>
+
+{#if $session.game && $session.game.started_at}
+    <Screen />
+{:else if $session.game}
+    <Lobby />
+{:else}
+    <Spinner />
+{/if}
 <Fullscreen />

@@ -3,20 +3,32 @@
   "description": "TODO",
   "version": "0.0.1",
   "scripts": {
-    "dev": "sapper dev",
-    "build": "sapper build --legacy",
+    "dev": "export NODE_ENV=dev && npx tailwindcss build src/app.css -o static/app.css && sapper dev",
+    "prod": "export NODE_ENV=production && npx tailwindcss build src/app.css -o static/app.css && sapper dev",
+    "build": "export NODE_ENV=production && npx tailwindcss build src/app.css -o static/app.css && sapper build --legacy",
     "export": "sapper export --legacy",
     "start": "node __sapper__/build"
   },
   "dependencies": {
     "@rollup/plugin-json": "^4.1.0",
     "@supabase/supabase-js": "^0.36.5",
+    "@tailwindcss/typography": "^0.2.0",
+    "@tailwindcss/ui": "^0.6.2",
+    "body-parser": "^1.19.0",
     "canvas-sketch-util": "^1.10.0",
     "compression": "^1.7.1",
+    "cookie-parser": "^1.4.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
     "howler": "^2.2.0",
-    "polka": "next",
+    "jsonwebtoken": "^8.5.1",
+    "knex": "^0.21.6",
+    "local-ip": "^2.0.0",
+    "nanoid": "^3.1.12",
+    "pg": "^8.4.1",
     "screenfull": "^5.0.2",
-    "sirv": "^1.0.0"
+    "sirv": "^1.0.0",
+    "tailwindcss": "^1.9.5"
   },
   "devDependencies": {
     "sapper": "^0.28.0",
