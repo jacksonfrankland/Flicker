@@ -1,14 +1,10 @@
 <script>
-    import Card from './Card.svelte';
-    import Label from './Label.svelte';
-    import Input from './Input.svelte';
-    import Button from './Button.svelte';
-    import Prose from './Prose.svelte';
     import { stores } from '@sapper/app';
+    import { Button, Card, Input, Prose, Label } from '@jacksonfrankland/game-kit';
     const { session } = stores();
 
     let code;
-    let name = $session.player.name;
+    let name = $session.player.name || '';
     let team = $session.player.team || 'blue';
     let typingTimeout;
 
@@ -27,7 +23,6 @@
         });
         $session.player = await res.json();
         code = '';
-        color = '';
     }
 
     function type () {
@@ -35,6 +30,13 @@
             clearTimeout(typingTimeout);
         }
         typingTimeout = setTimeout(update, 1000);
+    }
+
+    async function start () {
+        const res = await fetch('games', {
+            method: 'put',
+        });
+        $session.player.game = await res.json();
     }
 </script>
 
@@ -51,6 +53,9 @@
                 <div on:click={() => {team = 'blue'; update();}} class="bg-blue-400 rounded-md {team === 'blue' ? 'border-solid border-4 border-gray-500' : ''}"></div>
                 <div on:click={() => {team = 'red'; update();}} class="bg-red-400 rounded-md {team === 'red' ? 'border-solid border-4 border-gray-500' : ''}"></div>
             </div>
+            {#if $session.player.host}
+                <Button styles="mt-6" on:click={start}> Everybody is ready </Button>
+            {/if}
         {:else}
             <Label control="code"> Code </Label>
             <Input bind:value={code} id="code" styles="uppercase mb-4" placeholder="ABCDEF" />

@@ -14,8 +14,7 @@
     import { onMount, onDestroy } from 'svelte';
     import Lobby from '../components/Lobby.svelte';
     import Screen from '../components/Screen.svelte';
-    import Spinner from '../components/Spinner.svelte';
-    import Fullscreen from '../components/Fullscreen.svelte';
+    import { Fullscreen, Spinner } from '@jacksonfrankland/game-kit';
 
     const { session } = stores();
 
@@ -33,6 +32,7 @@
     })
 
     async function newGame () {
+        unsubscribe();
         $session.game = null;
         const res = await fetch('games', {
             method: 'post'
@@ -63,7 +63,7 @@
 </script>
 
 {#if $session.game && $session.game.started_at}
-    <Screen />
+    <Screen on:newGame={() => {newGame(); subscribe();}} />
 {:else if $session.game}
     <Lobby />
 {:else}

@@ -1,30 +1,26 @@
-import Vector from './Vector';
 import {Howl} from 'howler';
+import { Vector, Transform, boundaryBounce, manyToManyCollision, circleBounce } from '@jacksonfrankland/game-kit';
 
 export default class Disc {
 
     constructor (position = new Vector(), color = 'yellow', radius = .03) {
+        this.transform = new Transform(position);
+        this.transform.friction = .0015;
         this.trails = [];
-        this.position = position;
         this.radius = radius;
         this.color = color;
-        this.velocity = new Vector();
-        this.acceleration = new Vector();
+    }
+
+    get collider () {
+        return {
+            shape: 'circle',
+            radius: this.radius,
+            position: this.transform.position
+        }
     }
 
     static collisionDetection (discs) {
-        discs.forEach((a, i) => {
-            discs.slice(i + 1, discs.length).forEach(b => {
-                if (a.position.distanceSquared(b.position) <= Math.pow(a.radius + b.radius, 2)) {
-                    let aToB = b.position.subtract(a.position);
-                    Disc.hitSound(a.velocity.subtract(b.velocity).projectOnto(aToB).magnitude);
-                    a.addForce(a.velocity.multiply(-1).projectOnto(aToB));
-                    a.addForce(b.velocity.projectOnto(aToB));
-                    b.addForce(b.velocity.multiply(-1).projectOnto(aToB));
-                    b.addForce(a.velocity.projectOnto(aToB));
-                }
-            });
-        })
+        manyToManyCollision(discs, (a, b) => circleBounce(a, b, intensity => Disc.hitSound(intensity)));
     }
 
     static hitSound (volume) {
@@ -36,35 +32,23 @@ export default class Disc {
     }
 
     update (detail) {
-        // friction
-        this.addForce(this.velocity.multiply(-.0015 * detail.delta));
-
-        // apply acceleration
-        this.velocity = this.velocity.add(this.acceleration);
-        this.acceleration = new Vector();
+        this.transform.update(detail.delta);
 
         // bounce off bondaries
-        if (this.position.x > detail.width - this.radius && this.velocity.x > 0) { // right
-            this.addForce(Vector.left(this.velocity.x * 2));
-            Disc.hitSound(this.velocity.x);
+        let soundDirection = {
+            top: this.transform.velocity.y * -1,
+            right: this.transform.velocity.x,
+            bottom: this.transform.velocity.y,
+            left: this.transform.velocity.x * -1
         }
-        if (this.position.x < 0 + this.radius && this.velocity.x < 0) { // left
-            this.addForce(Vector.left(this.velocity.x * 2));
-            Disc.hitSound(this.velocity.x * -1);
-        }
-        if (this.position.y > detail.height - this.radius && this.velocity.y > 0) { // bottom
-            this.addForce(Vector.up(this.velocity.y * 2));
-            Disc.hitSound(this.velocity.y);
-        }
-        if (this.position.y < 0 + this.radius && this.velocity.y < 0) { // top
-            this.addForce(Vector.up(this.velocity.y * 2));
-            Disc.hitSound(this.velocity.y * -1);
-        }
+        boundaryBounce(this.transform, this.radius, new Vector, new Vector(detail.width, detail.height), direction => {
+            Disc.hitSound(soundDirection[direction]);
+        });
     }
 
     draw (detail) {
         // trail effecrt
-        this.trails.push({position: this.position, timeLeft: 200});
+        this.trails.push({position: this.transform.position, timeLeft: 200});
         this.trails = this.trails.map(trail => {
             return {position: trail.position, timeLeft: trail.timeLeft - detail.delta}
         });
@@ -72,12 +56,7 @@ export default class Disc {
         this.trails.forEach(trail => detail.circle(trail.position, this.radius * trail.timeLeft / 200, this.color));
 
         // actual position
-        this.position = this.position.add(this.velocity.multiply(detail.delta));
-        detail.circle(this.position, this.radius, this.color);
+        this.transform.position = this.transform.position.add(this.transform.velocity.multiply(detail.delta));
+        detail.circle(this.transform.position, this.radius, this.color);
     }
-
-    addForce (force) {
-        this.acceleration = this.acceleration.add(force);
-    }
-
 }

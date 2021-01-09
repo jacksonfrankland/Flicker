@@ -1,8 +1,8 @@
 <script>
     import { db } from '../store.js';
-    import Vector from '../game/Vector.js';
-    import GameCanvas from './GameCanvas.svelte';
-    import MouseEvents from './MouseEvents.svelte';
+    import { stores } from '@sapper/app';
+    import {Vector, GameCanvas, MouseEvents, Prose} from '@jacksonfrankland/game-kit';
+    const { session } = stores();
 
     const RADIUS = .15;
     const ORIGIN = new Vector(.5, .5);
@@ -12,6 +12,8 @@
     let offset = new Vector();
     let dragging = false;
     let canvas;
+
+    $: currentPlayer = $session.player && $session.player.game.players.find(player => player.id === $session.player.game.turn_order[0][0]);
 
     function update ({detail}) {
         detail.clear();
@@ -50,9 +52,23 @@
         offset = new Vector;
         let flick = ORIGIN.subtract(position).basic;
         position = ORIGIN;
-        await $db.from('games').update({ flick }).eq('id', 1);
+        await $db.from('games').update({ flick }).eq('id', $session.player.game_id);
+    }
+
+    async function leaveGame () {
+        console.log('test');
+        const res = await fetch('players', {
+            method: 'delete',
+        });
+        $session.player = await res.json();
     }
 </script>
 
-<MouseEvents element={canvas} on:mouseDown={mouseDown} on:mouseMove={mouseMove} on:mouseUp={mouseUp} />
-<GameCanvas bind:canvas on:update={update} styles="bg-teal-400 rounded-full" />
+<Prose styles="absolute top-0 right-1 z-50"> <a href={'javascript:void(0)'} on:click={leaveGame}> Leave Game </a> </Prose>
+
+{#if currentPlayer.id === $session.player.id}
+    <MouseEvents element={canvas} on:mouseDown={mouseDown} on:mouseMove={mouseMove} on:mouseUp={mouseUp} />
+    <GameCanvas bind:canvas on:update={update} styles="bg-teal-400 rounded-full" />
+{:else}
+    <Prose> <h1> It's {currentPlayer.name}'s turn </h1> </Prose>
+{/if}
