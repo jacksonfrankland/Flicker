@@ -15,7 +15,7 @@ const dev = NODE_ENV === 'development';
 
 const db = createClient(
     process.env.SUPABASE_URL,
-    process.env.SUPABASE_KEY
+    process.env.SUPABASE_PRIVATE_KEY
 );
 
 const ip = localIp();
@@ -34,6 +34,7 @@ express().use(
 			if (req.cookies.flickerToken) {
 				jsonWebToken.verify(req.cookies.flickerToken, process.env.JWT_SECRET, (error, decoded) => {
 					req.token = decoded
+
 				})
 			}
 			next();

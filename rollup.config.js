@@ -6,8 +6,10 @@ import json from '@rollup/plugin-json';
 import babel from '@rollup/plugin-babel';
 import { terser } from 'rollup-plugin-terser';
 import config from 'sapper/config/rollup.js';
+import dotenv from 'dotenv';
 import pkg from './package.json';
 
+dotenv.config();
 const mode = process.env.NODE_ENV;
 const dev = mode === 'development';
 const legacy = !!process.env.SAPPER_LEGACY_BUILD;
@@ -21,12 +23,15 @@ export default {
 	client: {
 		input: config.client.input(),
 		output: config.client.output(),
+		context: 'window',
 		plugins: [
-			json(),
 			replace({
 				'process.browser': true,
-				'process.env.NODE_ENV': JSON.stringify(mode)
+				'process.env.NODE_ENV': JSON.stringify(mode),
+				'process.env.SUPABASE_URL': JSON.stringify(process.env.SUPABASE_URL),
+				'process.env.SUPABASE_PUBLIC_KEY': JSON.stringify(process.env.SUPABASE_PUBLIC_KEY)
 			}),
+			json(),
 			svelte({
 				dev,
 				hydratable: true,
@@ -71,7 +76,7 @@ export default {
 			json(),
 			replace({
 				'process.browser': false,
-				'process.env.NODE_ENV': JSON.stringify(mode)
+				'process.env.NODE_ENV': JSON.stringify(mode),
 			}),
 			svelte({
 				generate: 'ssr',
@@ -96,7 +101,9 @@ export default {
 			resolve(),
 			replace({
 				'process.browser': true,
-				'process.env.NODE_ENV': JSON.stringify(mode)
+				'process.env.NODE_ENV': JSON.stringify(mode),
+				'process.env.SUPABASE_URL': JSON.stringify(process.env.SUPABASE_URL),
+				'process.env.SUPABASE_PUBLIC_KEY': JSON.stringify(process.env.SUPABASE_PUBLIC_KEY)
 			}),
 			commonjs(),
 			!dev && terser()

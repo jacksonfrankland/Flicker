@@ -1,18 +1,14 @@
 <script>
+    export let game;
     import Disc from '../game/Disc.js';
-    import { stores } from '@sapper/app';
-    import { createEventDispatcher } from 'svelte';
     import {Vector, GameCanvas, MouseEvents, Prose} from '@jacksonfrankland/game-kit';
 
-	const dispatch = createEventDispatcher();
-
-    const { session } = stores();
 
     let discs = [];
     let canvas;
 
-    $: if ($session.game.flick && discs.length) {
-        discs[0].transform.addForce(Vector.construct($session.game.flick).multiply(.008));
+    $: if ($game.flick && discs.length) {
+        discs[0].transform.addForce(Vector.construct($game.flick).multiply(.008));
     }
 
     function update ({detail}) {
@@ -20,8 +16,7 @@
         Disc.collisionDetection(discs);
         discs.forEach(disc => disc.update(detail));
         discs.forEach(disc => disc.draw(detail));
-        if ($session.game && $session.game.flick && discs.length && discs[0].transform.velocity.magnitudeSquared === 0) {
-            console.log('still');
+        if ($game && $game.flick && discs.length && discs[0].transform.velocity.magnitudeSquared === 0) {
         }
     }
 
@@ -29,15 +24,8 @@
         if (point.x < 0 || point.x > (16/9) || point.y < 0 || point.y > 1) return;
         discs.push(new Disc(point, discs.length === 0 ? 'black' : 'white'));
     }
-
-    async function newGame () {
-        const res = await fetch('games', {
-            method: 'delete',
-        });
-        dispatch('newGame');
-    }
 </script>
 
-<Prose styles="absolute top-0 right-1 z-50"> <a href={'javascript:void(0)'} on:click={newGame}> New Game </a> </Prose>
+<Prose styles="absolute top-0 right-1 z-50"> <a href={'javascript:void(0)'} on:click={game.newGame()}> New Game </a> </Prose>
 <MouseEvents element={canvas} on:click={click} />
 <GameCanvas bind:canvas ratio={16/9} on:update={update} styles="bg-teal-400" />

@@ -1,9 +1,13 @@
 // get player
 export async function get (req, res, next) {
     let player = null
+
     if (req.token && req.token.player_id) {
         try {
             player = (await req.db.from('players').select('*, game:game_id (*, players (*))').eq('id', req.token.player_id).single()).body;
+            if (player.game.deleted_at) {
+                player = null;
+            }
         } catch (e) {
             player = null;
         }
@@ -21,30 +25,22 @@ export async function post (req, res, next) {
 
 // update player
 export async function put (req, res, next) {
-    let update = {};
-    let game = null;
-    let players;
+    let game, player;
     if (req.body.code) {
         try {
-            game = (await req.db.from('games').select('id').eq('code', req.body.code.toUpperCase()).is('deleted_at', null).single()).body;
-            players = (await req.db.from('players').select('id', 'team').eq('game_id', game.id)).body;
-            update = {
-                team: players.filter(player => player.team === 'red') >= players.filter(player => player.team === 'blue') ? 'blue' : 'red',
+            game = (await req.db.from('games').select('*, players (*)').eq('code', req.body.code.toUpperCase()).is('deleted_at', null).single()).body;
+            player = (await req.db.from('players').update({
                 game_id: game.id,
-                in_game: true,
-                host: players.length === 0 || (players.reduce((previous, current) => {previous.id < current.id ? previous : current}).id === req.token.player_id)
-            }
+                name: req.body.name,
+                host: game.players.length === 0
+            }).eq('id', req.token.player_id).single()).body;
         } catch (e) {
             console.log(e);
         }
     }
-    ['team', 'name'].forEach(field => {
-        if (req.body[field]) {
-            update[field] = req.body[field];
-        }
-    });
-    await req.db.from('players').update(update).eq('id', req.token.player_id);
-    res.json((await req.db.from('players').select('*, game:game_id (*, players (*))').eq('id', req.token.player_id).single()).body);
+    game.players.push({...player});
+    player.game = game;
+    res.json(player);
 }
 
 // leave game

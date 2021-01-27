@@ -1,5 +1,5 @@
 <script>
-    import { db } from '../store.js';
+    export let game;
     import { stores } from '@sapper/app';
     import {Vector, GameCanvas, MouseEvents, Prose} from '@jacksonfrankland/game-kit';
     const { session } = stores();
@@ -13,7 +13,7 @@
     let dragging = false;
     let canvas;
 
-    $: currentPlayer = $session.player && $session.player.game.players.find(player => player.id === $session.player.game.turn_order[0][0]);
+    // $: currentPlayer = $session.player && $session.player.game.players.find(player => player.id === $session.player.game.turn_order[0][0]);
 
     function update ({detail}) {
         detail.clear();
@@ -52,11 +52,10 @@
         offset = new Vector;
         let flick = ORIGIN.subtract(position).basic;
         position = ORIGIN;
-        await $db.from('games').update({ flick }).eq('id', $session.player.game_id);
+        await game.flick(flick);
     }
 
     async function leaveGame () {
-        console.log('test');
         const res = await fetch('players', {
             method: 'delete',
         });
@@ -66,9 +65,9 @@
 
 <Prose styles="absolute top-0 right-1 z-50"> <a href={'javascript:void(0)'} on:click={leaveGame}> Leave Game </a> </Prose>
 
-{#if currentPlayer.id === $session.player.id}
+<!-- {#if currentPlayer.id === $session.player.id} -->
     <MouseEvents element={canvas} on:mouseDown={mouseDown} on:mouseMove={mouseMove} on:mouseUp={mouseUp} />
     <GameCanvas bind:canvas on:update={update} styles="bg-teal-400 rounded-full" />
-{:else}
+<!-- {:else}
     <Prose> <h1> It's {currentPlayer.name}'s turn </h1> </Prose>
-{/if}
+{/if} -->

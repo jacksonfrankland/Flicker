@@ -4,7 +4,7 @@ exports.up = function (knex) {
         table.increments('id');
         table.string('code', 4).notNullable();
         table.jsonb('flick');
-        table.jsonb('turn_order');
+        table.integer('current_player');
         table.timestamp('started_at');
         table.timestamps(true, true);
         table.timestamp('deleted_at');

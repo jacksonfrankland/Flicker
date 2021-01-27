@@ -1,7 +1,6 @@
 <script>
-    import { stores } from '@sapper/app';
+    export let game, ip;
     import {Card, Prose} from '@jacksonfrankland/game-kit';
-    const { session } = stores();
 
     async function newGame () {
          const res = await fetch('games', {
@@ -10,16 +9,16 @@
     }
 </script>
 
-<Prose styles="absolute top-0 right-1"> <a href={'javascript:void(0)'} on:click={newGame}> New Game </a> </Prose>
+<Prose styles="absolute top-0 right-1"> <a href={'javascript:void(0)'} on:click={game.newGame()}> New Game </a> </Prose>
 <Card transition>
     <Prose styles="text-center mx-auto">
         Visit
-        <a href="{$session.ip}:3000/play"> {$session.ip}:3000/play </a>
+        <a href="{ip}:3000/play"> {ip}:3000/play </a>
         and use the code
-        <span class="font-black font-mono"> {$session.game.code} </span>
+        <span class="font-black font-mono"> {$game.code} </span>
         <table>
             <tbody>
-                {#each $session.game.players.filter(player => player.name.length > 0) as player (player.id)}
+                {#each $game.players.filter(player => player.name.length > 0) as player (player.id)}
                     <tr class="{player.team === 'blue' ? 'bg-blue-300' : 'bg-red-300'} text-center"> <td>
                         {#if player.host}
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-6 w-6 inline">
