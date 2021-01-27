@@ -29,7 +29,6 @@
         game && game.unsubscribe();
     })
 </script>
-
 {#if $game && $game.started_at}
     <Screen {game} />
 {:else if $game}

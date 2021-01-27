@@ -32,7 +32,6 @@
     });
 
 </script>
-
 {#if $game && $game.started_at && !$game.deleted_at}
     <Controller {game} />
 {:else if player}

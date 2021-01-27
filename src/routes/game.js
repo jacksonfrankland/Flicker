@@ -28,3 +28,8 @@ export async function post (req, res, next) {
     game.players = [];
     res.json(game);
 }
+
+export async function del (req, res, next) {
+    await req.db.from('games').update({deleted_at: (new Date()).toISOString()}).eq('id', req.token.game_id);
+    res.json(true);
+}

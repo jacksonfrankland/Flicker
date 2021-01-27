@@ -31,10 +31,10 @@ export function createGameStore (game) {
         // },
         async newGame () {
             unsubscribe();
-            let res = await fetch('games', {
+            let res = await fetch('game', {
                 method: 'delete',
             });
-            res = await fetch('games', {
+            res = await fetch('game', {
                 method: 'post'
             });
             const game = await res.json();
