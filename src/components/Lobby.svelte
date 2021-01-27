@@ -13,7 +13,7 @@
 <Card transition>
     <Prose styles="text-center mx-auto">
         Visit
-        <a href="{ip}:3000/play"> {ip}:3000/play </a>
+        <a href="play"> {ip}:3000/play </a>
         and use the code
         <span class="font-black font-mono"> {$game.code} </span>
         <table>
