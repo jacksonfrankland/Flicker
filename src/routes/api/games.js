@@ -24,12 +24,27 @@ export async function post (req, res, next) {
     }
     let game = (await req.db.from('games').insert([{ code }])).body[0];
     req.token.game_id = game.id;
+    req.token.player_id = null;
     res.setToken(req.token);
     game.players = [];
     res.json(game);
 }
 
+export async function put (req, res, next) {
+    let gameId = req.token.game_id
+        ? req.token.game_id
+        : (await req.db.from('players').select('*, game:game_id (*, players (*))').eq('id', req.token.player_id).single()).body.game.id;
+
+    if (req.body.started_at) {
+        req.body.started_at = (new Date()).toISOString();
+    }
+    let game = (await req.db.from('games').update({started_at: req.body.started_at}).eq('id', gameId)).body[0];
+    req.pusher.trigger(`presence-game-${game.code}`, 'game-updated', game);
+    res.json(game);
+}
+
 export async function del (req, res, next) {
-    await req.db.from('games').update({deleted_at: (new Date()).toISOString()}).eq('id', req.token.game_id);
+    let game = (await req.db.from('games').update({deleted_at: (new Date()).toISOString()}).eq('id', req.token.game_id)).body[0];
+    req.pusher.trigger(`presence-game-${game.code}`, 'game-deleted', {});
     res.json(true);
 }

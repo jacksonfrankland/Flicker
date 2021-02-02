@@ -1,32 +1,37 @@
 <script>
-    export let player, game;
+    import { host, gameChannel } from '../store.js';
     import { stores } from '@sapper/app';
-    import { createEventDispatcher } from 'svelte';
     import { Button, Card, Input, Prose, Label } from '@jacksonfrankland/game-kit';
     const { session } = stores();
 
-    const dispatch = createEventDispatcher();
-
     let code;
-    let name = player.name || '';
-    let typingTimeout;
+    let name = $session.player.name || '';
+
+    console.log('join');
 
     async function update () {
-        const res = await fetch('player', {
+        const res = await fetch('api/players', {
             method: 'put',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({code, name}),
         });
-        player = await res.json();
-        dispatch('playerReady', player);
+        $session.player = await res.json();
+    }
+
+    function startGame () {
+        fetch('api/games', {
+            method: 'put',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({started_at: true}),
+        });
     }
 </script>
 
 <Card transition>
     <Prose styles="mx-auto">
         {#if $session.player.game}
-            {#if $session.player.host}
-                <Button styles="mt-6" on:click={() => {game.start()}}> Everybody is ready </Button>
+            {#if $host && ($host.id === $session.player.id)}
+                <Button styles="mt-6" on:click={startGame}> Everybody is ready </Button>
             {:else}
                 <h1> Waiting to start </h1>
             {/if}

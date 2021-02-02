@@ -1,6 +1,6 @@
 <script>
-    export let game;
     import { stores } from '@sapper/app';
+    import { gameChannel } from '../store.js';
     import {Vector, GameCanvas, MouseEvents, Prose} from '@jacksonfrankland/game-kit';
     const { session } = stores();
 
@@ -52,18 +52,10 @@
         offset = new Vector;
         let flick = ORIGIN.subtract(position).basic;
         position = ORIGIN;
-        await game.flick(flick);
+        $gameChannel.trigger('client-flick', flick);
     }
 
-    async function leaveGame () {
-        const res = await fetch('players', {
-            method: 'delete',
-        });
-        $session.player = await res.json();
-    }
 </script>
-
-<Prose styles="absolute top-0 right-1 z-50"> <a href={'javascript:void(0)'} on:click={leaveGame}> Leave Game </a> </Prose>
 
 <!-- {#if currentPlayer.id === $session.player.id} -->
     <MouseEvents element={canvas} on:mouseDown={mouseDown} on:mouseMove={mouseMove} on:mouseUp={mouseUp} />

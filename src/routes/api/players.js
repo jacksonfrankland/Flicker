@@ -5,11 +5,11 @@ export async function get (req, res, next) {
     if (req.token && req.token.player_id) {
         try {
             player = (await req.db.from('players').select('*, game:game_id (*, players (*))').eq('id', req.token.player_id).single()).body;
-            if (player.game.deleted_at) {
-                player = null;
+            if (player && player.game && player.game.deleted_at) {
+                player.game = null;
             }
         } catch (e) {
-            player = null;
+           console.error(e);
         }
     }
     res.json(player);
@@ -19,6 +19,7 @@ export async function get (req, res, next) {
 export async function post (req, res, next) {
     let player = (await req.db.from('players').insert([{}])).body[0];
     req.token.player_id = player.id;
+    req.token.game_id = null;
     res.setToken(req.token);
     res.json(player);
 }
@@ -32,10 +33,9 @@ export async function put (req, res, next) {
             player = (await req.db.from('players').update({
                 game_id: game.id,
                 name: req.body.name,
-                host: game.players.length === 0
             }).eq('id', req.token.player_id).single()).body;
         } catch (e) {
-            console.log(e);
+            console.error(e);
         }
     }
     game.players.push({...player});

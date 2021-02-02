@@ -1,15 +1,17 @@
 <script>
     export let game;
     import Disc from '../game/Disc.js';
+    import { newGame, gameChannel } from '../store.js';
     import {Vector, GameCanvas, MouseEvents, Prose} from '@jacksonfrankland/game-kit';
-
 
     let discs = [];
     let canvas;
 
-    $: if ($game.flick && discs.length) {
-        discs[0].transform.addForce(Vector.construct($game.flick).multiply(.008));
-    }
+    $: $gameChannel && $gameChannel.bind('client-flick', (data, metadata) => {
+        if (discs.length) {
+            discs[0].transform.addForce(Vector.construct(data).multiply(.008));
+        }
+    });
 
     function update ({detail}) {
         detail.clear();
@@ -26,6 +28,6 @@
     }
 </script>
 
-<Prose styles="absolute top-0 right-1 z-50"> <a href={'javascript:void(0)'} on:click={game.newGame()}> New Game </a> </Prose>
+<Prose styles="absolute top-0 right-1 z-50"> <a href={'javascript:void(0)'} on:click={newGame}> New Game </a> </Prose>
 <MouseEvents element={canvas} on:click={click} />
 <GameCanvas bind:canvas ratio={16/9} on:update={update} styles="bg-teal-400" />

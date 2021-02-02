@@ -29,7 +29,9 @@ export default {
 				'process.browser': true,
 				'process.env.NODE_ENV': JSON.stringify(mode),
 				'process.env.SUPABASE_URL': JSON.stringify(process.env.SUPABASE_URL),
-				'process.env.SUPABASE_PUBLIC_KEY': JSON.stringify(process.env.SUPABASE_PUBLIC_KEY)
+				'process.env.SUPABASE_PUBLIC_KEY': JSON.stringify(process.env.SUPABASE_PUBLIC_KEY),
+				'process.env.PUSHER_KEY': JSON.stringify(process.env.PUSHER_KEY),
+				'process.env.PUSHER_CLUSTER': JSON.stringify(process.env.PUSHER_CLUSTER),
 			}),
 			json(),
 			svelte({
