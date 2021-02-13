@@ -1,7 +1,6 @@
 import sirv from 'sirv';
 import dotenv from 'dotenv';
 import express from 'express';
-import localIp from 'local-ip';
 import cors from 'cors';
 import Pusher from "pusher";
 import bodyParser from 'body-parser';
@@ -28,8 +27,6 @@ const pusher = new Pusher({
 	useTLS: true
   });
 
-const ip = localIp();
-
 express().use(
 		compression({ threshold: 0 }),
 		sirv('static', { dev }),
@@ -54,7 +51,6 @@ express().use(
 		},
 		sapper.middleware({
 			session: (req, res) => ({
-				ip
 			})
 		})
 	)

@@ -7,8 +7,6 @@
     let code;
     let name = $session.player.name || '';
 
-    console.log('join');
-
     async function update () {
         const res = await fetch('api/players', {
             method: 'put',

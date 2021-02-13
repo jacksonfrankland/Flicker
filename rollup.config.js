@@ -8,6 +8,7 @@ import { terser } from 'rollup-plugin-terser';
 import config from 'sapper/config/rollup.js';
 import dotenv from 'dotenv';
 import pkg from './package.json';
+import localIp from 'local-ip';
 
 dotenv.config();
 const mode = process.env.NODE_ENV;
@@ -32,6 +33,7 @@ export default {
 				'process.env.SUPABASE_PUBLIC_KEY': JSON.stringify(process.env.SUPABASE_PUBLIC_KEY),
 				'process.env.PUSHER_KEY': JSON.stringify(process.env.PUSHER_KEY),
 				'process.env.PUSHER_CLUSTER': JSON.stringify(process.env.PUSHER_CLUSTER),
+				'process.env.URL': JSON.stringify(process.env.URL || `${localIp()}:3000`),
 			}),
 			json(),
 			svelte({
@@ -79,6 +81,7 @@ export default {
 			replace({
 				'process.browser': false,
 				'process.env.NODE_ENV': JSON.stringify(mode),
+				'process.env.URL': JSON.stringify(process.env.URL || `${localIp()}:3000`),
 			}),
 			svelte({
 				generate: 'ssr',

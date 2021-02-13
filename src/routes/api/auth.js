@@ -3,17 +3,17 @@ export async function post (req, res, next) {
     const channel = req.body.channel_name;
     if (req.token && req.token.game_id) { // screen
         try {
-            let game = (await req.db.from('games').select('*, players (*)').eq('id', req.token.game_id).is('deleted_at', null).single()).body;
+            let game = (await req.db.from('games').select('*, players (*)').eq('id', req.token.game_id).is('deleted_at', null).single()).data;
             if (game && game.code === channel.slice(channel.length - 4)) {
                 res.send(req.pusher.authenticate(socketId, channel, {
                     user_id: 'screen',
                     user_info: {}
                 }));
             }
-        } catch (e) {}
+        } catch (e) {console.error(e)}
     } else if (req.token && req.token.player_id) { // player
         try {
-            let player = (await req.db.from('players').select('*, game:game_id (*)').eq('id', req.token.player_id).single()).body;
+            let player = (await req.db.from('players').select('*, game:game_id (*)').eq('id', req.token.player_id).single()).data;
             if (player && player.game && !player.game.deleted_at && player.game.code === channel.slice(channel.length - 4)) {
                 res.send(req.pusher.authenticate(socketId, channel, {
                     user_id: `player${player.id}`,

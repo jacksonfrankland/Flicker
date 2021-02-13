@@ -1,14 +1,16 @@
 <script>
-    export let ip, code;
+    export let url, code;
     import {Card, Prose} from '@jacksonfrankland/game-kit';
-    import {players, host, newGame} from '../store.js';
+    import {players, host} from '../store.js';
+    import { createEventDispatcher } from 'svelte';
+	const dispatch = createEventDispatcher();
 </script>
 
-<Prose styles="absolute top-0 right-1"> <a href={'javascript:void(0)'} on:click={newGame}> New Game </a> </Prose>
-<Card transition>
+<Prose styles="absolute top-0 right-1"> <a href={'javascript:void(0)'} on:click={() => {dispatch('newGame')}}> New Game </a> </Prose>
+<Card>
     <Prose styles="text-center mx-auto">
         Visit
-        <a href="play"> {ip}:3000/play </a>
+        <a href="play"> {url}/play </a>
         and use the code
         <span class="font-black font-mono"> {code} </span>
         <table>

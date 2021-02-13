@@ -29,6 +29,7 @@ export function createGameChannel (code) {
         // players.update(players => players.filter(player => player.id != member.info.id));
       });
     gameChannel.set(channel);
+    return channel;
 }
 
 export async function newGame () {

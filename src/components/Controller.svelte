@@ -1,6 +1,6 @@
 <script>
     import { stores } from '@sapper/app';
-    import { gameChannel } from '../store.js';
+    import { host, gameChannel, players } from '../store.js';
     import {Vector, GameCanvas, MouseEvents, Prose} from '@jacksonfrankland/game-kit';
     const { session } = stores();
 
@@ -13,7 +13,10 @@
     let dragging = false;
     let canvas;
 
-    // $: currentPlayer = $session.player && $session.player.game.players.find(player => player.id === $session.player.game.turn_order[0][0]);
+    let currentPlayer = null;
+    $: if ($host) {
+        currentPlayer = $host;
+    }
 
     function update ({detail}) {
         detail.clear();
@@ -54,12 +57,13 @@
         position = ORIGIN;
         $gameChannel.trigger('client-flick', flick);
     }
-
 </script>
 
-<!-- {#if currentPlayer.id === $session.player.id} -->
+{#if currentPlayer && $session.player.id == currentPlayer.id}
     <MouseEvents element={canvas} on:mouseDown={mouseDown} on:mouseMove={mouseMove} on:mouseUp={mouseUp} />
     <GameCanvas bind:canvas on:update={update} styles="bg-teal-400 rounded-full" />
-<!-- {:else}
-    <Prose> <h1> It's {currentPlayer.name}'s turn </h1> </Prose>
-{/if} -->
+{:else if currentPlayer}
+    <Prose> <h1> It's {$players.find(player => player.id === currentPlayer.id).name}'s turn </h1> </Prose>
+{:else}
+    Waiting
+{/if}
