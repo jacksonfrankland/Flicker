@@ -16,7 +16,7 @@
 
     async function loadGame () {
         if (!game) {
-            res = await fetch('api/games', { method: 'post' });
+            let res = await fetch('api/games', { method: 'post' });
             game = await res.json();
         }
         return game;
