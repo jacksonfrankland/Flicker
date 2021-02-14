@@ -1,9 +1,11 @@
 <script>
-    export let url, code;
+    export let url, game;
     import {Card, Prose} from '@jacksonfrankland/game-kit';
     import {players, host} from '../store.js';
     import { createEventDispatcher } from 'svelte';
 	const dispatch = createEventDispatcher();
+
+    $players = game.players;
 </script>
 
 <Prose styles="absolute top-0 right-1"> <a href={'javascript:void(0)'} on:click={() => {dispatch('newGame')}}> New Game </a> </Prose>
@@ -12,7 +14,7 @@
         Visit
         <a href="play"> {url}/play </a>
         and use the code
-        <span class="font-black font-mono"> {code} </span>
+        <span class="font-black font-mono"> {game.code} </span>
         <table>
             <tbody>
                 {#each $players.filter(player => player.name.length > 0).sort((a, b) => a.id - b.id) as player (player.id)}

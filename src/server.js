@@ -9,6 +9,7 @@ import jsonWebToken from 'jsonwebtoken';
 import * as sapper from '@sapper/server';
 import cookieParser from 'cookie-parser';
 import { createClient } from '@supabase/supabase-js';
+import {get as getGame, create as createGame} from './database/games.js';
 
 dotenv.config();
 const { PORT, NODE_ENV } = process.env;
@@ -27,7 +28,7 @@ const pusher = new Pusher({
 	useTLS: true
   });
 
-express().use(
+	express().use(
 		compression({ threshold: 0 }),
 		sirv('static', { dev }),
 		bodyParser.json(),
@@ -47,11 +48,16 @@ express().use(
 
 				})
 			}
+			res.session = {};
+			if (req.url === '/' && req.method === 'GET') {
+				console.log(req.token);
+				res.session.game = (await getGame(req.token.game_id, db)) || (await createGame(db));
+				res.setToken({game_id: res.session.game.id});
+			}
 			next();
 		},
 		sapper.middleware({
-			session: (req, res) => ({
-			})
+			session: (req, res) => res.session
 		})
 	)
 	.listen(PORT, err => {

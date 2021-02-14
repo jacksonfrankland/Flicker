@@ -8,6 +8,6 @@
 {#if game.started_at && !game.deleted_at}
     <Game on:newGame />
 {:else}
-    <Lobby url={process.env.URL} code={game.code} on:newGame />
+    <Lobby url={process.env.URL} {game} on:newGame />
 {/if}
 <Fullscreen />

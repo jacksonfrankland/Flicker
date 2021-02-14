@@ -1,26 +1,9 @@
-<script context="module">
-    export async function preload (page, session) {
-        let res = await this.fetch('api/games', { method: 'get' });
-        let game = await res.json();
-        return {game};
-    }
-</script>
-
 <script>
-    export let game;
     import { createGameChannel, players, pusher, gameChannel } from '../store.js';
-    import { onMount } from 'svelte';
-    import Lobby from '../components/Lobby.svelte';
     import Screen from '../components/Screen.svelte';
-    import { Fullscreen, Spinner } from '@jacksonfrankland/game-kit';
-
-    async function loadGame () {
-        if (!game) {
-            let res = await fetch('api/games', { method: 'post' });
-            game = await res.json();
-        }
-        return game;
-    }
+    import { Spinner } from '@jacksonfrankland/game-kit';
+    import { stores } from '@sapper/app';
+	const { session } = stores();
 
     function newGame () {
         loadingGame = (async () => {
@@ -28,11 +11,12 @@
             pusher.unsubscribe($gameChannel.name);
             const res = await fetch('api/games', {method: 'post'});
             $gameChannel = null;
+            $players = [];
             return await res.json();
         })();
     }
 
-    let loadingGame = process.browser ? loadGame() : false;
+    let loadingGame = process.browser ? (async () => $session.game)() : false;
 
     $: if (loadingGame) {
         loadingGame.then(game => {
@@ -54,7 +38,7 @@
     {:catch error}
         <p style="color: red">{error.message}</p>
     {/await}
-{:else if game}
-    <Screen {game} />
+{:else}
+    <Screen game={$session.game} />
 {/if}
 
