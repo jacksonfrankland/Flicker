@@ -1,3 +1,3 @@
-<main class="bg-gray-100 h-screen flex">
+<main class="bg-coolGray-700 h-screen flex">
 	<slot></slot>
 </main>

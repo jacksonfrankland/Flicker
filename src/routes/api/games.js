@@ -15,10 +15,12 @@ export async function put (req, res, next) {
         req.body.started_at = (new Date()).toISOString();
 
     }
+    let players = game.players;
     game = (await req.db.from('games').update({
         started_at: req.body.started_at,
         current_player: game.players.reduce((host, player) => player.id < host.id ? player : host).id
     }).eq('id', game.id)).data[0];
+    game.players = players;
     req.pusher.trigger(`presence-game-${game.code}`, 'game-updated', game);
     res.json(game);
 }

@@ -13,11 +13,6 @@
     let dragging = false;
     let canvas;
 
-    let currentPlayer = null;
-    $: if ($host) {
-        currentPlayer = $host;
-    }
-
     function update ({detail}) {
         detail.clear();
         detail.circle(position, RADIUS, 'black');
@@ -59,11 +54,9 @@
     }
 </script>
 
-{#if currentPlayer && $session.player.id == currentPlayer.id}
+{#if $session.player.id == $session.player.game.current_player}
     <MouseEvents element={canvas} on:mouseDown={mouseDown} on:mouseMove={mouseMove} on:mouseUp={mouseUp} />
     <GameCanvas bind:canvas on:update={update} styles="bg-teal-400 rounded-full" />
-{:else if currentPlayer}
-    <Prose> <h1> It's {$players.find(player => player.id === currentPlayer.id).name}'s turn </h1> </Prose>
 {:else}
-    Waiting
+    <Prose> <h1> It's {$players.find(player => player.id === $session.player.game.current_player).name}'s turn </h1> </Prose>
 {/if}

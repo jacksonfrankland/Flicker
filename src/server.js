@@ -10,6 +10,7 @@ import * as sapper from '@sapper/server';
 import cookieParser from 'cookie-parser';
 import { createClient } from '@supabase/supabase-js';
 import {get as getGame, create as createGame} from './database/games.js';
+import {get as getPlayer, create as createPlayer} from './database/players.js';
 
 dotenv.config();
 const { PORT, NODE_ENV } = process.env;
@@ -50,9 +51,11 @@ const pusher = new Pusher({
 			}
 			res.session = {};
 			if (req.url === '/' && req.method === 'GET') {
-				console.log(req.token);
 				res.session.game = (await getGame(req.token.game_id, db)) || (await createGame(db));
 				res.setToken({game_id: res.session.game.id});
+			} else if (req.url === '/play' && req.method === 'GET') {
+				res.session.player = (await getPlayer(req.token.player_id, db)) || (await createPlayer(db));
+				res.setToken({player_id: res.session.player.id});
 			}
 			next();
 		},

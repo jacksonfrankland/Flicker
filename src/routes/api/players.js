@@ -1,20 +1,3 @@
-// get player
-export async function get (req, res, next) {
-    let player = null
-
-    if (req.token && req.token.player_id) {
-        try {
-            player = (await req.db.from('players').select('*, game:game_id (*, players (*))').eq('id', req.token.player_id).single()).data;
-            if (player && player.game && player.game.deleted_at) {
-                player.game = null;
-            }
-        } catch (e) {
-           console.error(e);
-        }
-    }
-    res.json(player);
-}
-
 // create player
 export async function post (req, res, next) {
     let player = (await req.db.from('players').insert([{}])).data[0];
@@ -27,16 +10,28 @@ export async function post (req, res, next) {
 // update player
 export async function put (req, res, next) {
     let game, player;
-    if (req.body.code) {
-        try {
-            game = (await req.db.from('games').select('*, players (*)').eq('code', req.body.code.toUpperCase()).is('deleted_at', null).single()).data;
-            player = (await req.db.from('players').update({
-                game_id: game.id,
-                name: req.body.name,
-            }).eq('id', req.token.player_id).single()).data;
-        } catch (e) {
-            console.error(e);
+    let errors = [];
+    ['name', 'code'].forEach(key => {
+        if(!req.body[key]) {
+            errors.push(`A ${key} is required`);
         }
+    });
+    if (errors.length) {
+        res.json({errors});
+        return;
+    }
+    try {
+        game = (await req.db.from('games').select('*, players (*)').eq('code', req.body.code?.toUpperCase()).is('deleted_at', null).single()).data;
+        if (!game) {
+            res.json({errors: ["Couldn't find game"]});
+            return;
+        }
+        player = (await req.db.from('players').update({
+            game_id: game.id,
+            name: req.body.name,
+        }).eq('id', req.token.player_id).single()).data;
+    } catch (e) {
+        console.error(e);
     }
     game.players.push({...player});
     player.game = game;

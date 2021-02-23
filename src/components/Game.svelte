@@ -35,4 +35,4 @@
 
 <Prose styles="absolute top-0 right-1 z-50"> <a href={'javascript:void(0)'} on:click={() => {dispatch('newGame')}}> New Game </a> </Prose>
 <MouseEvents element={canvas} on:click={click} />
-<GameCanvas bind:canvas ratio={16/9} on:update={update} styles="bg-teal-400" />
+<GameCanvas bind:canvas ratio={16/9} on:update={update} styles="bg-teal-400 card p-0" />
