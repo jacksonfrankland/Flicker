@@ -1,7 +1,7 @@
 <script>
     import { stores } from '@sapper/app';
     import { host, gameChannel, players } from '../store.js';
-    import {Vector, GameCanvas, MouseEvents, Prose} from '@jacksonfrankland/game-kit';
+    import {Vector, GameCanvas, MouseEvents} from '@jacksonfrankland/game-kit';
     const { session } = stores();
 
     const RADIUS = .15;
@@ -12,6 +12,8 @@
     let offset = new Vector();
     let dragging = false;
     let canvas;
+
+    players.set($session.player.game.players);
 
     function update ({detail}) {
         detail.clear();
@@ -58,5 +60,7 @@
     <MouseEvents element={canvas} on:mouseDown={mouseDown} on:mouseMove={mouseMove} on:mouseUp={mouseUp} />
     <GameCanvas bind:canvas on:update={update} styles="bg-teal-400 rounded-full" />
 {:else}
-    <Prose> <h1> It's {$players.find(player => player.id === $session.player.game.current_player).name}'s turn </h1> </Prose>
+    <div class="card grid max-w-2xl bg-white gap-8 my-auto">
+        <h1 class="font-bold mx-auto text-lg"> It's {$players.find(player => player.id === $session.player.game.current_player).name}'s turn </h1>
+    </div>
 {/if}

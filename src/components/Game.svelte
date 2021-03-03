@@ -1,12 +1,16 @@
 <script>
+    export let fullscreen;
+
     import Disc from '../game/Disc.js';
-    import { gameChannel } from '../store.js';
+    import { gameChannel, colors } from '../store.js';
     import {Vector, GameCanvas, MouseEvents, Prose} from '@jacksonfrankland/game-kit';
     import { createEventDispatcher } from 'svelte';
 	const dispatch = createEventDispatcher();
 
     let discs = [];
     let canvas;
+
+    discs.push(new Disc(new Vector(.5, .5), 'pink'));
 
     if (process.browser) {
         $gameChannel.bind('client-flick', (data, metadata) => {
@@ -33,6 +37,9 @@
     }
 </script>
 
-<Prose styles="absolute top-0 right-1 z-50"> <a href={'javascript:void(0)'} on:click={() => {dispatch('newGame')}}> New Game </a> </Prose>
+<a class="text-coolGray-400 hover:underline text-lg pr-2 ml-auto" href={'javascript:void(0)'} on:click={() => {dispatch('newGame')}}> New Game </a>
+<!-- <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-16 w-16 inline" style="fill: {$colors.rose[300]}; stroke: {$colors.rose[900]}">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg> -->
 <MouseEvents element={canvas} on:click={click} />
-<GameCanvas bind:canvas ratio={16/9} on:update={update} styles="bg-teal-400 card p-0" />
+<GameCanvas bleed={new Vector(2, fullscreen ? 4 : 8)} bind:canvas ratio={16/9} on:update={update} styles="bg-coolGray-600 border-dashed border-4 border-cool-gray-800 p-0 rounded-lg" />

@@ -26,9 +26,14 @@ export async function put (req, res, next) {
             res.json({errors: ["Couldn't find game"]});
             return;
         }
+        let colors = [
+            'red', 'orange', 'yellow', 'lime', 'emerald', 'cyan', 'blue', 'violet', 'fuchsia', 'rose'
+        ].filter(color => game.players.map(player => player.color).indexOf(color) < 0);
+
         player = (await req.db.from('players').update({
             game_id: game.id,
             name: req.body.name,
+            color: colors[Math.floor(Math.random() * colors.length)],
         }).eq('id', req.token.player_id).single()).data;
     } catch (e) {
         console.error(e);

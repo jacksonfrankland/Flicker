@@ -1,9 +1,10 @@
 import {Howl} from 'howler';
 import { Vector, Transform, boundaryBounce, manyToManyCollision, circleBounce } from '@jacksonfrankland/game-kit';
+import {colors} from '../store.js';
 
 export default class Disc {
 
-    constructor (position = new Vector(), color = 'yellow', radius = .03) {
+    constructor (position = new Vector(), color = 'yellow', radius = .04) {
         this.transform = new Transform(position);
         this.transform.friction = .0015;
         this.trails = [];
@@ -53,10 +54,31 @@ export default class Disc {
             return {position: trail.position, timeLeft: trail.timeLeft - detail.delta}
         });
         this.trails = this.trails.filter(trail => trail.timeLeft > 0);
-        this.trails.forEach(trail => detail.circle(trail.position, this.radius * trail.timeLeft / 200, this.color));
+        this.trails.forEach(trail => detail.circle(trail.position, this.radius * trail.timeLeft / 200, colors[this.color][900]));
 
         // actual position
         this.transform.position = this.transform.position.add(this.transform.velocity.multiply(detail.delta));
-        detail.circle(this.transform.position, this.radius, this.color);
+        detail.circle(this.transform.position, this.radius, colors[this.color][300]);
+        detail.circle(this.transform.position.add(new Vector(this.radius * -.4, this.radius * -.3)), this.radius * .3, 'white');
+        detail.circle(this.transform.position.add(new Vector(this.radius * -.4, this.radius * -.3)), this.radius * .1, colors[this.color][900]);
+        detail.circle(this.transform.position.add(new Vector(this.radius * -.4, this.radius * -.3)), this.radius * .3, colors[this.color][900], false, .002);
+        detail.circle(this.transform.position.add(new Vector(this.radius * .4, this.radius * -.3)), this.radius * .3, 'white');
+        detail.circle(this.transform.position.add(new Vector(this.radius * .4, this.radius * -.3)), this.radius * .1, colors[this.color][900]);
+        detail.circle(this.transform.position.add(new Vector(this.radius * .4, this.radius * -.3)), this.radius * .3, colors[this.color][900], false, .002);
+        detail.circle(this.transform.position, this.radius, colors[this.color][900], false, .007);
+
+        if (this.transform.velocity.magnitudeSquared > 0) {
+            detail.circle(this.transform.position.add(Vector.down(this.radius * .4)), this.radius * .3, colors[this.color][900]);
+        } else {
+            detail.ctx.save();
+            detail.ctx.beginPath();
+            detail.ctx.lineWidth = 10;
+            detail.ctx.lineCap = 'round';
+            detail.ctx.strokeStyle = colors[this.color][900];
+            let centre = this.transform.position.add(Vector.down(this.radius * .3)).multiply(detail.canvasSize).round;
+            detail.ctx.arc(centre.x, centre.y, Math.round(this.radius * .3 * detail.canvasSize), 0, Math.PI, false);
+            detail.ctx.stroke();
+            detail.ctx.restore();
+        }
     }
 }

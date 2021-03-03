@@ -1,6 +1,8 @@
 import Pusher from 'pusher-js';
 import { writable, derived } from 'svelte/store';
 
+export {default as colors} from 'tailwindcss/colors';
+
 export const pusher = new Pusher(process.env.PUSHER_KEY, {
     cluster: process.env.PUSHER_CLUSTER,
     authEndpoint: '/api/auth'

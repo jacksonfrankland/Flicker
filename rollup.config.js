@@ -68,7 +68,7 @@ export default {
 				module: true
 			})
 		],
-
+		external: Object.keys(pkg.dependencies).concat(require('module').builtinModules),
 		preserveEntrySignatures: false,
 		onwarn,
 	},
