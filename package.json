@@ -3,7 +3,7 @@
   "description": "TODO",
   "version": "0.0.1",
   "scripts": {
-    "dev": "export NODE_ENV=dev && npx tailwindcss build src/app.css -o static/app.css && sapper dev",
+    "dev": "export NODE_ENV=dev && npm link @jacksonfrankland/game-kit && npx tailwindcss build src/app.css -o static/app.css && sapper dev",
     "prod": "export NODE_ENV=production && npx tailwindcss build src/app.css -o static/app.css && sapper dev",
     "build": "export NODE_ENV=production && npx tailwindcss build src/app.css -o static/app.css && sapper build --legacy",
     "export": "sapper export --legacy",
