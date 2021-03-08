@@ -10,7 +10,9 @@
     let discs = [];
     let canvas;
 
-    discs.push(new Disc(new Vector(.5, .5), 'pink'));
+    discs.push(new Disc(new Vector(.5, .5), 'blue'));
+    discs.push(new Disc(new Vector(.8, .5), 'red'));
+    discs.push(new Disc(new Vector(1.2, .5), 'yellow'));
 
     if (process.browser) {
         $gameChannel.bind('client-flick', (data, metadata) => {
@@ -21,6 +23,7 @@
     }
 
     function update ({detail}) {
+        detail.additionalCtx[0].globalCompositeOperation = 'overlay'
         detail.clear();
         Disc.collisionDetection(discs);
         discs.forEach(disc => disc.update(detail));
@@ -34,6 +37,7 @@
     function click({detail: point}) {
         if (point.x < 0 || point.x > (16/9) || point.y < 0 || point.y > 1) return;
         discs.push(new Disc(point, discs.length === 0 ? 'black' : 'white'));
+        console.log(discs[0].particles.length);
     }
 </script>
 
@@ -42,4 +46,16 @@
     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
 </svg> -->
 <MouseEvents element={canvas} on:click={click} />
-<GameCanvas bleed={new Vector(2, fullscreen ? 4 : 8)} bind:canvas ratio={16/9} on:update={update} styles="bg-coolGray-600 border-dashed border-4 border-cool-gray-800 p-0 rounded-lg" />
+<GameCanvas bleed={new Vector(2, fullscreen ? 4 : 8)} bind:canvas ratio={16/9} on:update={update} additionalCanvases="{[{filter: 'blur', z: 20}, {background: 'coolGray-800', z: 10}]}"
+    styles="bg-transparent z-30 border-dashed border-4 border-cool-gray-800 p-0 rounded-lg" />
+
+<svg>
+    <filter id="blur">
+        <feColorMatrix in="SourceGraphic"
+        type="matrix"
+        values="1 0 0 0 0
+                0 1 0 0 0
+                0 0 1 0 0
+                0 0 0 0 .1" />
+    </filter>
+</svg>

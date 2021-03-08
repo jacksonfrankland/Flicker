@@ -51,25 +51,27 @@ export default class Disc {
     draw (detail) {
         // particle effecrt
 
-        let particle = {transform: new Transform(this.transform.position), timeLeft: 600};
+        let particle = {transform: new Transform(this.transform.position), timeLeft: 900, origin: new Vector(this.transform.position.x, this.transform.position.y)};
         particle.transform.velocity = new Vector(Math.random() * .00025 - .000125, Math.random() * .00025 - .000125);
         this.particles.push(particle);
         this.particles = this.particles.map(particle => {
             return {...particle, timeLeft: particle.timeLeft - detail.delta}
         });
         this.particles = this.particles.filter(particle => particle.timeLeft > 0);
-        this.particles.forEach(particle => detail.circle(particle.transform.position, this.radius * particle.timeLeft / 600, colors[this.color][400]));
+        this.particles.forEach(particle => {
+            detail.circle(particle.transform.position, this.radius * particle.timeLeft / 900, colors[this.color][400]);
+            detail.circle(particle.origin.add(particle.transform.position.subtract(particle.origin).multiply(3)), this.radius * 2 * particle.timeLeft / 900, colors[this.color][400], true, 0, detail.additionalCtx[0]);
+        });
 
         // actual position
         this.transform.position = this.transform.position.add(this.transform.velocity.multiply(detail.delta));
         detail.circle(this.transform.position, this.radius, colors[this.color][400]);
+        detail.circle(this.transform.position, this.radius * 2, colors[this.color][400], true, 0, detail.additionalCtx[0]);
+
         detail.circle(this.transform.position.add(new Vector(this.radius * -.4, this.radius * -.3)), this.radius * .3, 'white');
         detail.circle(this.transform.position.add(new Vector(this.radius * -.4, this.radius * -.3)), this.radius * .1, colors[this.color][800]);
-        // detail.circle(this.transform.position.add(new Vector(this.radius * -.4, this.radius * -.3)), this.radius * .3, colors[this.color][800], false, .002);
         detail.circle(this.transform.position.add(new Vector(this.radius * .4, this.radius * -.3)), this.radius * .3, 'white');
         detail.circle(this.transform.position.add(new Vector(this.radius * .4, this.radius * -.3)), this.radius * .1, colors[this.color][800]);
-        // detail.circle(this.transform.position.add(new Vector(this.radius * .4, this.radius * -.3)), this.radius * .3, colors[this.color][800], false, .002);
-        // detail.circle(this.transform.position, this.radius, colors[this.color][900], false, .007);
 
         if (this.transform.velocity.magnitudeSquared > 0) {
             detail.circle(this.transform.position.add(Vector.down(this.radius * .4)), this.radius * .3, colors[this.color][900]);
