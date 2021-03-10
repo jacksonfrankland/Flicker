@@ -12,7 +12,8 @@ import localIp from 'local-ip';
 
 dotenv.config();
 const mode = process.env.NODE_ENV;
-const dev = mode === 'development';
+const dev = mode === 'development' || mode === 'dev';
+const production = !dev;
 const legacy = !!process.env.SAPPER_LEGACY_BUILD;
 
 const onwarn = (warning, onwarn) =>
@@ -91,7 +92,7 @@ export default {
 			resolve({
 				dedupe: ['svelte']
 			}),
-			commonjs()
+			commonjs(),
 		],
 		external: Object.keys(pkg.dependencies).concat(require('module').builtinModules),
 

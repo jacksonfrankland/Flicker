@@ -4,8 +4,9 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "export NODE_ENV=dev && npm link @jacksonfrankland/game-kit && npx tailwindcss build src/app.css -o static/app.css && sapper dev",
+    "workers": "export NODE_ENV=dev && rollup -c workers.config.js -w",
     "prod": "export NODE_ENV=production && npx tailwindcss build src/app.css -o static/app.css && sapper dev",
-    "build": "export NODE_ENV=production && npx tailwindcss build src/app.css -o static/app.css && sapper build --legacy",
+    "build": "export NODE_ENV=production && npx tailwindcss build src/app.css -o static/app.css && rollup -c workers.config.js && sapper build --legacy",
     "export": "sapper export --legacy",
     "start": "node __sapper__/build"
   },
