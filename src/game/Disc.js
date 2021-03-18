@@ -8,8 +8,11 @@ export default class Disc {
         this.transform = new Transform(position);
         this.transform.friction = .0015;
         this.particles = [];
+        this.lightParticles = [];
         this.radius = radius;
         this.color = color;
+        this.particalLife = 750;
+        this.particleSpawn = 17;
     }
 
     get collider () {
@@ -51,22 +54,33 @@ export default class Disc {
     draw (detail) {
         // particle effecrt
 
-        let particle = {transform: new Transform(this.transform.position), timeLeft: 900, origin: new Vector(this.transform.position.x, this.transform.position.y)};
-        particle.transform.velocity = new Vector(Math.random() * .00025 - .000125, Math.random() * .00025 - .000125);
-        this.particles.push(particle);
+        if (!this.particles.length || this.particalLife - this.particles[this.particles.length - 1].timeLeft > this.particleSpawn) {
+            let particle = {transform: new Transform(this.transform.position), timeLeft: this.particalLife, origin: new Vector(this.transform.position.x, this.transform.position.y)};
+            particle.transform.velocity = new Vector(Math.random() * .00025 - .000125, Math.random() * .00025 - .000125);
+            this.particles.push(particle);
+            if (this.transform.velocity.magnitudeSquared > 0) {
+                this.lightParticles.push(particle);
+            }
+        }
         this.particles = this.particles.map(particle => {
             return {...particle, timeLeft: particle.timeLeft - detail.delta}
         });
+        this.lightParticles = this.lightParticles.map(particle => {
+            return {...particle, timeLeft: particle.timeLeft - detail.delta}
+        });
         this.particles = this.particles.filter(particle => particle.timeLeft > 0);
+        this.lightParticles = this.lightParticles.filter(particle => particle.timeLeft > 0);
         this.particles.forEach(particle => {
-            detail.circle(particle.transform.position, this.radius * particle.timeLeft / 900, colors[this.color][400]);
-            detail.circle(particle.origin.add(particle.transform.position.subtract(particle.origin).multiply(3)), this.radius * 2 * particle.timeLeft / 900, colors[this.color][400], true, 0, detail.additionalCtx[0]);
+            detail.circle(particle.transform.position, this.radius * particle.timeLeft / this.particalLife, colors[this.color][400]);
+        });
+        this.lightParticles.forEach(particle => {
+            detail.circle(particle.origin.add(particle.transform.position.subtract(particle.origin).multiply(3)), this.radius * 2 * particle.timeLeft / this.particalLife, colors[this.color][400], true, 0, detail.additionalCtx[0]);
         });
 
         // actual position
         this.transform.position = this.transform.position.add(this.transform.velocity.multiply(detail.delta));
         detail.circle(this.transform.position, this.radius, colors[this.color][400]);
-        detail.circle(this.transform.position, this.radius * 2, colors[this.color][400], true, 0, detail.additionalCtx[0]);
+        detail.circle(this.transform.position, this.radius * this.transform.velocity.magnitudeSquared * 3, colors[this.color][400], true, 0, detail.additionalCtx[0]);
 
         detail.circle(this.transform.position.add(new Vector(this.radius * -.4, this.radius * -.3)), this.radius * .3, 'white');
         detail.circle(this.transform.position.add(new Vector(this.radius * -.4, this.radius * -.3)), this.radius * .1, colors[this.color][800]);

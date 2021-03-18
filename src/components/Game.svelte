@@ -10,8 +10,6 @@
     let discs = [];
     let canvas;
 
-    let worker = process.browser ? new Worker("worker.js") : null;
-
     discs.push(new Disc(new Vector(.5, .5), 'blue'));
     discs.push(new Disc(new Vector(.8, .5), 'red'));
     discs.push(new Disc(new Vector(1.2, .5), 'yellow'));
@@ -22,13 +20,6 @@
                 discs[0].transform.addForce(Vector.construct(data).multiply(.006));
             }
         });
-        worker.postMessage(1);
-        worker.onmessage = e => {
-            console.log(e.data);
-        }
-        worker.onerror = e => {
-            console.error(e);
-        }
     }
 
     function update ({detail}) {
@@ -56,7 +47,7 @@
 </svg> -->
 <MouseEvents element={canvas} on:click={click} />
 <GameCanvas bleed={new Vector(2, fullscreen ? 4 : 8)} bind:canvas ratio={16/9} on:update={update} additionalCanvases="{[{filter: 'blur', z: 20}, {background: 'coolGray-800', z: 10}]}"
-    styles="bg-transparent z-30 border-dashed border-4 border-cool-gray-800 p-0 rounded-lg" worker={worker}/>
+    styles="bg-transparent z-30 border-dashed border-4 border-cool-gray-800 p-0 rounded-lg"/>
 
 <svg>
     <filter id="blur">
